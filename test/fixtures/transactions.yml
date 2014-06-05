@@ -1,0 +1,13 @@
+# Read about fixtures at http://api.rubyonrails.org/classes/Fixtures.html
+
+one:
+  date: 2011-07-18
+  description: MyString
+  amount: 1
+  balance: 1
+
+two:
+  date: 2011-07-18
+  description: MyString
+  amount: 1
+  balance: 1
