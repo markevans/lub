@@ -1,1 +1,11 @@
-HOMEPAGE
+<table>
+  <% @transactions.each do |transaction| %>
+    <tr>
+      <td><%= transaction.date %></td>
+      <td><%= transaction.description %></td>
+      <td><%= transaction.tags_list %></td>
+      <td><%= transaction.amount %></td>
+      <td><%= transaction.balance %></td>
+    </tr>
+  <% end %>
+</table>
