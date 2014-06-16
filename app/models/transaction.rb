@@ -35,7 +35,14 @@ class Transaction < ActiveRecord::Base
     Digest::MD5.hexdigest("#{date}#{amount}#{balance}")
   end
 
-  def tags_list
+  def tag!(name)
+    transaction do
+      tag = Tag.find_or_create_by!(name: name)
+      taggings.create(tag: tag)
+    end
+  end
+
+  def tag_list
     tags.map(&:name).join(', ')
   end
 end
