@@ -19,6 +19,11 @@ class Transaction < ActiveRecord::Base
   scope :pos, ->{ where('amount > 0') }
   scope :neg, ->{ where('amount < 0') }
 
+  unique_taggings = "(SELECT DISTINCT(transaction_id) from taggings) t ON transactions.id=t.transaction_id"
+  scope :tagged, ->{ joins("INNER JOIN #{unique_taggings}") }
+  scope :not_tagged, ->{ joins("LEFT JOIN #{unique_taggings}")
+                         .where("transaction_id IS NULL") }
+
   def self.total
     Money.new sum(:amount)
   end
