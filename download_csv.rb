@@ -1,4 +1,5 @@
 require 'bundler/setup'
+require 'yaml'
 require 'capybara'
 require 'pry'
 require 'io/console'
@@ -21,44 +22,10 @@ end
 class FirstDirectSession
   include Capybara::DSL
 
-  def initialize(username="mark_evans")
-    @username = username
+  CONFIG_PATH = 'first_direct.yml'
+
+  def initialize
     Capybara.default_driver = :selenium
-  end
-
-  attr_accessor :username
-
-  def login
-    # First page
-    visit 'https://www1.firstdirect.com/1/2/idv.Logoff?nextPage=fsdtBalances'
-    fill_in 'userid', with: username
-    click_on 'Proceed'
-
-    # Secure key page
-    click_on "Log on without your Secure Key"
-
-    # Password page
-    labels = page.all('form label', visible: false)
-    labels.each do |label|
-      puts label.text(:all)
-      value = STDIN.noecho(&:gets).chomp
-      input = page.find("form ##{label['for']}")
-      input.set(value)
-    end
-    click_on 'Proceed'
-  end
-
-  def back_to_top
-    within('#fdLeftMenu') do
-      click_on 'view statements'
-    end
-  end
-
-  def ensure_logged_in
-    unless @logged_in
-      login
-      @logged_in = true
-    end
   end
 
   def download_statement(from: 90.days.ago, to: Date.yesterday)
@@ -90,6 +57,56 @@ class FirstDirectSession
       # clicking errors for some reason
       download_link.native.send_keys(:enter)
     end
+  end
+
+  private
+
+  def login
+    # First page
+    visit 'https://www1.firstdirect.com/1/2/idv.Logoff?nextPage=fsdtBalances'
+    username = get_config('username') || ask("Username:")
+    fill_in 'userid', with: username
+    click_on 'Proceed'
+
+    # Secure key page
+    click_on "Log on without your Secure Key"
+
+    # Password page
+    labels = page.all('form label', visible: false)
+    labels.each do |label|
+      value = ask(label.text(:all))
+      input = page.find("form ##{label['for']}")
+      input.set(value)
+    end
+    click_on 'Proceed'
+  end
+
+  def back_to_top
+    within('#fdLeftMenu') do
+      click_on 'view statements'
+    end
+  end
+
+  def ensure_logged_in
+    unless @logged_in
+      login
+      @logged_in = true
+    end
+  end
+
+  def get_config(key)
+    config[key] if config
+  end
+
+  def config
+    @config ||= begin
+      YAML.load_file(CONFIG_PATH) if File.exists?(CONFIG_PATH)
+    end
+  end
+
+  def ask(message)
+    puts message
+    STDIN.noecho(&:gets).chomp
   end
 end
 
