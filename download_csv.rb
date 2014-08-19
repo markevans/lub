@@ -34,6 +34,9 @@ class FirstDirectSession
     fill_in 'userid', with: username
     click_on 'Proceed'
 
+    # Secure key page
+    click_on "Log on without your Secure Key"
+
     # Password page
     labels = page.all('form label', visible: false)
     labels.each do |label|
