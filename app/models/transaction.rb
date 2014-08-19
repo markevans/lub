@@ -18,6 +18,12 @@ class Transaction < ActiveRecord::Base
   }
   scope :pos, ->{ where('amount > 0') }
   scope :neg, ->{ where('amount < 0') }
+  scope :cost, ->(amount) do
+    case amount
+    when Range then where(amount: (-amount.last*100..-amount.first*100))
+    else where(amount: -amount*100)
+    end
+  end
 
   unique_taggings = "(SELECT DISTINCT(transaction_id) from taggings) t ON transactions.id=t.transaction_id"
   scope :tagged, ->{ joins("INNER JOIN #{unique_taggings}") }
