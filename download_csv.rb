@@ -72,6 +72,7 @@ class FirstDirectSession
     click_on "Log on without your Secure Key"
 
     # Password page
+    page.has_css?('form label')
     labels = page.all('form label', visible: false)
     labels.each do |label|
       value = ask(label.text(:all))
