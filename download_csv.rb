@@ -46,7 +46,7 @@ class FirstDirectSession
     statement_date = '25/%02d/%d' % [month, year]
     select statement_date, from: 'StatementDate'
     page.all('form a').select{|a| a.text == 'go' }.last.click
-    click_on 'download'
+    find('a', text: /\Adownload\Z/).click
     select 'Microsoft Excel', from: 'DownloadFormat'
     download_file
   end
