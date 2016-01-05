@@ -84,7 +84,10 @@ class FirstDirectSession
 
   def back_to_top
     within('#fdLeftMenu') do
-      click_on 'view statements'
+      if !page.has_content?("View statements")
+        click_on "Statements"
+      end
+      click_on "View statements"
     end
   end
 
